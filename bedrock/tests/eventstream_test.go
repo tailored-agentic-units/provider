@@ -12,7 +12,9 @@ import (
 )
 
 // encodeEvent encodes a single event stream message into binary format.
-func encodeEvent(messageType, eventType string, payload []byte) []byte {
+func encodeEvent(t *testing.T, messageType, eventType string, payload []byte) []byte {
+	t.Helper()
+
 	msg := eventstream.Message{
 		Headers: eventstream.Headers{
 			{
@@ -29,7 +31,9 @@ func encodeEvent(messageType, eventType string, payload []byte) []byte {
 
 	var buf bytes.Buffer
 	encoder := eventstream.NewEncoder()
-	encoder.Encode(&buf, msg)
+	if err := encoder.Encode(&buf, msg); err != nil {
+		t.Fatalf("failed to encode event: %v", err)
+	}
 	return buf.Bytes()
 }
 
@@ -42,7 +46,7 @@ func TestEventStreamMedia(t *testing.T) {
 
 func TestEventStreamReader_ContentBlockDelta(t *testing.T) {
 	payload := []byte(`{"contentBlockIndex":0,"delta":{"text":"Hello"}}`)
-	data := encodeEvent("event", "contentBlockDelta", payload)
+	data := encodeEvent(t, "event", "contentBlockDelta", payload)
 
 	reader := bedrock.NewEventStreamReader()
 	lines := reader.ReadStream(context.Background(), bytes.NewReader(data))
@@ -79,7 +83,7 @@ func TestEventStreamReader_ContentBlockDelta(t *testing.T) {
 
 func TestEventStreamReader_MessageStop(t *testing.T) {
 	payload := []byte(`{"stopReason":"end_turn"}`)
-	data := encodeEvent("event", "messageStop", payload)
+	data := encodeEvent(t, "event", "messageStop", payload)
 
 	reader := bedrock.NewEventStreamReader()
 	lines := reader.ReadStream(context.Background(), bytes.NewReader(data))
@@ -113,9 +117,9 @@ func TestEventStreamReader_MessageStop(t *testing.T) {
 
 func TestEventStreamReader_MultipleEvents(t *testing.T) {
 	var buf bytes.Buffer
-	buf.Write(encodeEvent("event", "contentBlockDelta", []byte(`{"delta":{"text":"Hello"}}`)))
-	buf.Write(encodeEvent("event", "contentBlockDelta", []byte(`{"delta":{"text":" world"}}`)))
-	buf.Write(encodeEvent("event", "messageStop", []byte(`{"stopReason":"end_turn"}`)))
+	buf.Write(encodeEvent(t, "event", "contentBlockDelta", []byte(`{"delta":{"text":"Hello"}}`)))
+	buf.Write(encodeEvent(t, "event", "contentBlockDelta", []byte(`{"delta":{"text":" world"}}`)))
+	buf.Write(encodeEvent(t, "event", "messageStop", []byte(`{"stopReason":"end_turn"}`)))
 
 	reader := bedrock.NewEventStreamReader()
 	lines := reader.ReadStream(context.Background(), &buf)
@@ -134,7 +138,7 @@ func TestEventStreamReader_MultipleEvents(t *testing.T) {
 }
 
 func TestEventStreamReader_Exception(t *testing.T) {
-	data := encodeEvent("exception", "validationException", []byte(`{"message":"Invalid model ID"}`))
+	data := encodeEvent(t, "exception", "validationException", []byte(`{"message":"Invalid model ID"}`))
 
 	reader := bedrock.NewEventStreamReader()
 	lines := reader.ReadStream(context.Background(), bytes.NewReader(data))

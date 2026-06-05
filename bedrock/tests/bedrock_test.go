@@ -13,8 +13,8 @@ func validBedrockConfig() *config.ProviderConfig {
 		Name: "bedrock",
 		Options: map[string]any{
 			"region":            "us-east-1",
-			"auth_type":        "static",
-			"access_key_id":    "AKIAIOSFODNN7EXAMPLE",
+			"auth_type":         "static",
+			"access_key_id":     "AKIAIOSFODNN7EXAMPLE",
 			"secret_access_key": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
 		},
 	}
@@ -40,8 +40,8 @@ func TestNewBedrock_AutoBaseURL(t *testing.T) {
 		Name: "bedrock",
 		Options: map[string]any{
 			"region":            "us-west-2",
-			"auth_type":        "static",
-			"access_key_id":    "AKIAIOSFODNN7EXAMPLE",
+			"auth_type":         "static",
+			"access_key_id":     "AKIAIOSFODNN7EXAMPLE",
 			"secret_access_key": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
 		},
 	}
@@ -63,8 +63,8 @@ func TestNewBedrock_CustomBaseURL(t *testing.T) {
 		BaseURL: "https://custom-endpoint.example.com",
 		Options: map[string]any{
 			"region":            "us-east-1",
-			"auth_type":        "static",
-			"access_key_id":    "AKIAIOSFODNN7EXAMPLE",
+			"auth_type":         "static",
+			"access_key_id":     "AKIAIOSFODNN7EXAMPLE",
 			"secret_access_key": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
 		},
 	}
